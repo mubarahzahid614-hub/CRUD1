@@ -1,0 +1,98 @@
+﻿@page "/vehicles"
+@inject IVehicleService VehicleService
+@inject IJSRuntime JS
+
+<PageTitle>Vehicles</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Vehicles</h3>
+    <a href="/vehicles/create" class="btn btn-primary">+ Add Vehicle</a>
+</div>
+
+<input class="form-control mb-3"
+       placeholder="Search by make or model..."
+       @bind="search"
+       @bind:event="oninput"
+       @bind:after="LoadAsync" />
+
+@if (vehicles is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (vehicles.Count == 0)
+{
+    <div class="alert alert-info">No vehicles found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Make</th>
+                    <th>Model</th>
+                    <th>Year</th>
+                    <th>Mileage</th>
+                    <th>Grade</th>
+                    <th>Price (JPY)</th>
+                    <th>Status</th>
+                    <th style="width:150px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in vehicles)
+                {
+                    <tr>
+                        <td>@v.Id</td>
+                        <td>@v.Make</td>
+                        <td>@v.Model</td>
+                        <td>@v.Year</td>
+                        <td>@v.Mileage.ToString("N0") km</td>
+                        <td>@v.AuctionGrade</td>
+                        <td>¥ @v.PriceJPY.ToString("N0")</td>
+                        <td>
+                            <span class="badge @GetBadge(v.Status)">@v.Status</span>
+                        </td>
+                        <td>
+                            <a href="/vehicles/edit/@v.Id" class="btn btn-sm btn-warning">Edit</a>
+                            <button class="btn btn-sm btn-danger" @onclick="() => DeleteAsync(v)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Vehicle>? vehicles;
+    private string? search;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        vehicles = await VehicleService.GetAllAsync(search);
+    }
+
+    private async Task DeleteAsync(Vehicle v)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete {v.Make} {v.Model}?");
+        if (!confirmed) return;
+
+        await VehicleService.DeleteAsync(v.Id);
+        await LoadAsync();
+    }
+
+    private static string GetBadge(string status) => status switch
+    {
+        "Available" => "bg-success",
+        "Reserved" => "bg-warning text-dark",
+        "Sold" => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+}

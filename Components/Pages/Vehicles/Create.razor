@@ -1,0 +1,18 @@
+﻿@page "/vehicles/create"
+@inject IVehicleService VehicleService
+@inject NavigationManager Nav
+
+<PageTitle>Add Vehicle</PageTitle>
+<h3>Add Vehicle</h3>
+
+<VehicleForm Vehicle="vehicle" ButtonText="Create" OnSave="SaveAsync" />
+
+@code {
+    private Vehicle vehicle = new();
+
+    private async Task SaveAsync(Vehicle v)
+    {
+        await VehicleService.CreateAsync(v);
+        Nav.NavigateTo("/vehicles");
+    }
+}

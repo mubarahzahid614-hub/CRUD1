@@ -1,0 +1,39 @@
+﻿@page "/vehicles/edit/{Id:int}"
+@inject IVehicleService VehicleService
+@inject NavigationManager Nav
+
+<PageTitle>Edit Vehicle</PageTitle>
+<h3>Edit Vehicle</h3>
+
+@if (loading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (vehicle is null)
+{
+    <div class="alert alert-danger">Vehicle not found.</div>
+    <a href="/vehicles" class="btn btn-secondary">Back</a>
+}
+else
+{
+    <VehicleForm Vehicle="vehicle" ButtonText="Update" OnSave="SaveAsync" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Vehicle? vehicle;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vehicle = await VehicleService.GetByIdAsync(Id);
+        loading = false;
+    }
+
+    private async Task SaveAsync(Vehicle v)
+    {
+        await VehicleService.UpdateAsync(v);
+        Nav.NavigateTo("/vehicles");
+    }
+}

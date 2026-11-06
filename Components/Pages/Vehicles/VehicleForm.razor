@@ -1,0 +1,87 @@
+﻿<EditForm Model="Vehicle" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" />
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Make</label>
+            <InputText class="form-control" @bind-Value="Vehicle.Make" placeholder="Toyota" />
+            <ValidationMessage For="() => Vehicle.Make" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Model</label>
+            <InputText class="form-control" @bind-Value="Vehicle.Model" placeholder="Corolla Axio" />
+            <ValidationMessage For="() => Vehicle.Model" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Year</label>
+            <InputNumber class="form-control" @bind-Value="Vehicle.Year" />
+            <ValidationMessage For="() => Vehicle.Year" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Mileage (km)</label>
+            <InputNumber class="form-control" @bind-Value="Vehicle.Mileage" />
+            <ValidationMessage For="() => Vehicle.Mileage" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Color</label>
+            <InputText class="form-control" @bind-Value="Vehicle.Color" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Transmission</label>
+            <InputSelect class="form-select" @bind-Value="Vehicle.Transmission">
+                <option>Automatic</option>
+                <option>Manual</option>
+            </InputSelect>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Fuel Type</label>
+            <InputSelect class="form-select" @bind-Value="Vehicle.FuelType">
+                <option>Petrol</option>
+                <option>Diesel</option>
+                <option>Hybrid</option>
+                <option>Electric</option>
+            </InputSelect>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Auction Grade</label>
+            <InputText class="form-control" @bind-Value="Vehicle.AuctionGrade" placeholder="4.5" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Price (JPY)</label>
+            <InputNumber class="form-control" @bind-Value="Vehicle.PriceJPY" />
+            <ValidationMessage For="() => Vehicle.PriceJPY" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Status</label>
+            <InputSelect class="form-select" @bind-Value="Vehicle.Status">
+                <option>Available</option>
+                <option>Reserved</option>
+                <option>Sold</option>
+            </InputSelect>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success me-2">@ButtonText</button>
+    <a href="/vehicles" class="btn btn-secondary">Cancel</a>
+</EditForm>
+
+@code {
+    [Parameter] public Vehicle Vehicle { get; set; } = new();
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback<Vehicle> OnSave { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        await OnSave.InvokeAsync(Vehicle);
+    }
+}
